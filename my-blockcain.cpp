@@ -1,15 +1,8 @@
-#include <iostream>
-#include "SHA256.h"
+#include "headers.h"
 
-using std::string;
-using std::cout;
-using std::endl;
-
-int main(int argc, char* argv[])
+int main()
 {
-    string input = "grape";
-    string output1 = sha256(input);
+    vector<user> users;
+    generateUsers(users);
 
-    cout << "sha256('" << input << "'):" << output1 << endl;
-    return 0;
 }

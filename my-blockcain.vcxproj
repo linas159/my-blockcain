@@ -127,10 +127,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="generate.cpp" />
     <ClCompile Include="my-blockcain.cpp" />
     <ClCompile Include="SHA256.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="headers.h" />
     <ClInclude Include="SHA256.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
