@@ -7,13 +7,14 @@
 #include <random>
 #include <algorithm>
 #include <iomanip>
+#include <time.h>
 
 using namespace std;
 
 struct user {
 	string name;
 	string public_key;
-	int balance;
+	double balance;
 };
 
 struct transaction {
@@ -25,4 +26,5 @@ struct transaction {
 
 
 
-void generateUsers(vector<user> users);
+void generateUsers(vector<user> &users);
+void generateTransactions(vector<user> users, vector <transaction> &transactions);
