@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /users.txt
 /transactions.txt
+/result.txt

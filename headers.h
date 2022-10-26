@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <time.h>
+#include <chrono>
 
 using namespace std;
 
@@ -53,7 +54,26 @@ public:
     void setSum(int sum);
 };
 
+struct block
+{
+    string hash;
+    vector<transaction> transactions;
+};
+
+struct blockChain 
+{
+    string prevHash;
+    int timestamp;
+    string version;
+    string merkelRoot;
+    int nonce;
+    string diff;
+    block blocks;
+};
 
 
 void generateUsers(vector<user> &users);
 void generateTransactions(vector<user> users, vector <transaction> &transactions);
+string mineBlock(vector<blockChain> bc, int b);
+blockChain gen_block(int difficulty, int number, vector<transaction>& transaction, int block_count);
+void print_to_file(vector<blockChain> blockchain_blocks, int x);
