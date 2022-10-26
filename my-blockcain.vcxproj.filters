@@ -24,6 +24,9 @@
     <ClCompile Include="generate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="classRealization.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SHA256.h">

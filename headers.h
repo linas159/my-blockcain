@@ -11,17 +11,46 @@
 
 using namespace std;
 
-struct user {
-	string name;
-	string public_key;
-	double balance;
+class user
+{
+private:
+    string name;
+    string public_key;
+    int balance;
+
+public:
+    user(string name, string pk, int bal);
+
+    string getName();
+    string getPublicKey();
+    int getBalance();
+
+    void setName(string name);
+    void setPublicKey(string key);
+    void setBalance(int bal);
 };
 
-struct transaction {
-	string transactionID;
-	string sender;
-	string receiver;
-	double sum;
+
+class transaction
+{
+private:
+    string transactionID;
+    string sender;
+    string receiver;
+    double sum;
+
+public:
+    transaction(string transID, string send, string rec, int sum);
+
+    string getTransactionID();
+    string getSender();
+    string getReceiver();
+    int getSum();
+
+    void setTransactionID(string transactionID);
+    void setSender(string sender);
+    void setReceiver(string receiver);
+    void setSum(int sum);
 };
 
 

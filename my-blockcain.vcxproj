@@ -127,6 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="classRealization.cpp" />
     <ClCompile Include="generate.cpp" />
     <ClCompile Include="my-blockcain.cpp" />
     <ClCompile Include="SHA256.cpp" />
