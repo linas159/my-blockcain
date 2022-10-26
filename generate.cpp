@@ -16,9 +16,11 @@ void generateUsers(vector<user> &users)
 	ofstream uout("users.txt");
 
 	for (int i = 0; i < users.size(); i++) {
-		uout << users.at(i).name << " ";
-		uout << users.at(i).public_key << " ";
-		uout << users.at(i).balance << endl;
+		uout << "User" + to_string(i+1) << ":" << endl;
+		uout << "Name: " << users.at(i).name << endl;
+		uout << "Public key: " << users.at(i).public_key << endl;
+		uout << "Balance: " << users.at(i).balance << endl;
+		uout << endl;
 	}
 	uout.close();
 }
@@ -38,10 +40,12 @@ void generateTransactions(vector<user> users, vector <transaction> &transactions
 	ofstream tout("transactions.txt");
 
 	for (int i = 0; i < transactions.size(); i++) {
-		tout << transactions.at(i).transactionID << " ";
-		tout << transactions.at(i).sender << " ";
-		tout << transactions.at(i).receiver << " ";
-		tout << transactions.at(i).sum << endl;
+		tout << "Transaction" + to_string(i+1) << ":" << endl;
+		tout << "Transaction ID :" << transactions.at(i).transactionID << endl;
+		tout << "Sender: " << transactions.at(i).sender << endl;
+		tout << "Receiver: " << transactions.at(i).receiver << endl;
+		tout << "Sum: " << transactions.at(i).sum << endl;
+		tout << endl;
 	}
 	tout.close();
 }
