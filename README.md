@@ -1,4 +1,4 @@
-# My Blockcain
+# My Blockchain
 
 Simple blockchain implementation for Vilnius University "Blockchain technologies" course.
 
