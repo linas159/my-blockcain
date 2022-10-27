@@ -1,5 +1,4 @@
 #pragma once
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -74,6 +73,5 @@ struct blockChain
 
 void generateUsers(vector<user> &users);
 void generateTransactions(vector<user> users, vector <transaction> &transactions);
-string mineBlock(vector<blockChain> bc, int b);
-blockChain gen_block(int difficulty, int number, vector<transaction>& transaction, int block_count);
-void print_to_file(vector<blockChain> blockchain_blocks, int x);
+string mineBlock(blockChain &bc, string prevHash, int k);
+void mineBlocks(vector<user>& users, vector<transaction>& transactions, vector<blockChain>& blockchain);

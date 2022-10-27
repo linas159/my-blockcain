@@ -1,8 +1,5 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include "headers.h"
+﻿#include "headers.h"
 #include "SHA256.h"
-
-
 
 void generateUsers(vector<user> &users)
 {
@@ -52,85 +49,93 @@ void generateTransactions(vector<user> users, vector <transaction> &transactions
 	tout.close();
 }
 
-string mineBlock(vector<blockChain> bc, int b)
+string mineBlock(blockChain& bc, string prevHash, int k)
 {
-	int x;
-	string newhash;
-	if (b == 1)
-		bc.at(b).prevHash = sha256("1");
+	if (k == 1)
+		bc.prevHash = sha256("1");
 	else
-		bc.at(b).prevHash = bc.at(b - 1).blocks.hash;
+		bc.prevHash = prevHash;
 
-	bc.at(b).timestamp = time(nullptr);
-	bc.at(b).version = "v" + to_string(b) + ".0";
-	bc.at(b).diff = "0";
+	bc.timestamp = time(nullptr);
+	bc.version = "v" + to_string(k) + ".0";
+	bc.diff = "00";
 
-	for (int i = 0; i < 100; i++)
-		bc.at(b).merkelRoot += bc.at(b).blocks.transactions.at(i).getTransactionID();
+	for (int i = 0; i < bc.blocks.transactions.size(); i++)
+		bc.merkelRoot += bc.blocks.transactions.at(i).getTransactionID();
 
-	x = bc.at(b).diff.size()-1;
-
-	for (int i = 0; i < 69; i++) {
-		bc.at(b).nonce = rand() % 1000000;
-		newhash = sha256(bc.at(b).diff + bc.at(b).merkelRoot + bc.at(b).prevHash + to_string(bc.at(b).timestamp) + bc.at(b).version + to_string(bc.at(b).nonce));
-		if (newhash.substr(1, x) == bc.at(b).diff)
+	int x = bc.diff.size();
+	string newhash;
+	int nonce = 0;
+	while (true)
+	{
+		newhash = sha256(bc.diff + bc.merkelRoot + bc.prevHash + to_string(bc.timestamp) + bc.version + to_string(nonce));
+		if (newhash.substr(0, x) == bc.diff) {
+			bc.nonce = nonce;
 			return newhash;
+		}
+		nonce++;
 	}
 
 	return "0";
 }
 
-blockChain gen_block(int difficulty, int number, vector<transaction>& transaction, int block_count)
+void mineBlocks(vector<user>& users, vector<transaction>& transactions, vector<blockChain>& blockchain) 
 {
-	blockChain blockchain;
-
-	string all_transactions;
-
-	blockchain.version = "0.1";
-
-	blockchain.nonce = number;
-	blockchain.blocks.hash = sha256(to_string(number));
-
-	for (int i = 0; i < 100; i++)
+	int k = 0;
+	while (transactions.size() != 0)
 	{
-		int transaction_id = rand()%transaction.size();
+		blockChain tempbc;
+		while (tempbc.blocks.transactions.size() != 100 && transactions.size() != 0) // block'ą sudaro 100 transakcijų
+		{
 
-		blockchain.blocks.transactions.push_back(transaction[transaction_id]);
-		//cout << transaction[transaction_id].sum <<endl;
+			uniform_int_distribution<> distr(0, transactions.size() - 1);
+			int random = rand() % transactions.size(), i;
 
-		all_transactions += blockchain.blocks.transactions.back().getTransactionID();
+			for (i = 0; i < 1000; i++)
+			{
+				if (transactions.at(random).getSender() == users.at(i).getPublicKey())
+				{
+					break;
+				}
+			}
 
-		transaction.erase(transaction.begin() + transaction_id);
+			if (users.at(i).getBalance() >= transactions.at(random).getSum()) {
+				tempbc.blocks.transactions.push_back(transactions.at(random));
+				transactions.erase(transactions.begin() + random);
+			}
+			else {
+				transactions.erase(transactions.begin() + random);
+			}
+		}
+
+		k++;
+		if (k == 1)
+		{
+			tempbc.blocks.hash = mineBlock(tempbc, "", k);
+		}
+		else
+		{
+
+			tempbc.blocks.hash = mineBlock(tempbc, blockchain.at(k - 2).blocks.hash, k);
+		}
+
+		blockchain.push_back(tempbc);
+		cout << "Block mined! hash: " << blockchain.at(k - 1).blocks.hash << endl;
+
+		for (auto tran : blockchain.at(k - 1).blocks.transactions) {
+			int send = 0, get = 0;
+			for (int i = 0; i < 1000; i++) {
+				if (users.at(i).getPublicKey() == tran.getSender())
+					send = i;
+				else if (users.at(i).getPublicKey() == tran.getReceiver())
+					get = i;
+				if (send != 0 && get != 0)
+					break;
+			}
+
+			users.at(send).setBalance(users.at(send).getBalance() - tran.getSum());
+			users.at(get).setBalance(users.at(send).getBalance() + tran.getSum());
+		}
 	}
-
-	blockchain.merkelRoot = sha256(all_transactions);
-
-	if (block_count != 0)
-		blockchain.prevHash = blockchain.blocks.hash;
-
-	blockchain.diff = difficulty;
-
-	return blockchain;
 }
-void print_to_file(vector<blockChain> blockchain_blocks, int x)
-{
-	auto start = std::chrono::system_clock::now();
-	auto end = std::chrono::system_clock::now();
 
-	std::chrono::duration<double> elapsed_seconds = end - start;
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-	ofstream fr;
-	fr.open("result.txt", fstream::app);
-
-	fr << "Block of the blockchain " << x + 1 << ": " << endl;
-	fr << "Hash: " << blockchain_blocks.back().blocks.hash << endl;
-	fr << "Timestamp: " << ctime(&end_time);
-	fr << "Version: " << blockchain_blocks.back().version << endl;
-	fr << "Merkel Root Hash: " << blockchain_blocks.back().merkelRoot << endl;
-	fr << "Nonce: " << blockchain_blocks.back().nonce << endl;
-	fr << "Difficulty: " << blockchain_blocks.back().diff << endl;
-	fr << "Number of transactions: " << blockchain_blocks.back().blocks.transactions.size() << endl;
-	fr << endl;
-
-	fr.close();
-}
