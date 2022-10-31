@@ -107,8 +107,13 @@ void mineBlocks(vector<user>& users, vector<transaction>& transactions, vector<b
 				}
 			}
 
-			if (users.at(i).getBalance() >= transactions.at(random).getSum()) {
+			if (users.at(i).getBalance() >= transactions.at(random).getSum()) // TRANSACTION VERIFICATION
+			{
 				tempbc.blocks.transactions.push_back(transactions.at(random));
+				if (tempbc.blocks.transactions.back().getTransactionID() != transactions.at(random).getTransactionID())
+				{
+					tempbc.blocks.transactions.pop_back();
+				}
 				transactions.erase(transactions.begin() + random);
 			}
 			else {
