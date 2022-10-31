@@ -49,6 +49,15 @@ void generateTransactions(vector<user> users, vector <transaction> &transactions
 	tout.close();
 }
 
+void generateMerkelRoot(blockChain &bc)
+{
+	for (int i = 0; i < bc.blocks.transactions.size(); i++)
+	{
+		bc.merkelRoot += bc.blocks.transactions.at(i).getTransactionID();
+	}
+	bc.merkelRoot = sha256(bc.merkelRoot);
+}
+
 string mineBlock(blockChain& bc, string prevHash, int k)
 {
 	if (k == 1)
@@ -58,11 +67,10 @@ string mineBlock(blockChain& bc, string prevHash, int k)
 
 	bc.timestamp = time(nullptr);
 	bc.version = "v" + to_string(k) + ".0";
-	bc.diff = "00";
+	bc.diff = "0";
 
-	for (int i = 0; i < bc.blocks.transactions.size(); i++)
-		bc.merkelRoot += bc.blocks.transactions.at(i).getTransactionID();
-
+	generateMerkelRoot(bc);
+		
 	int x = bc.diff.size();
 	string newhash;
 	int nonce = 0;

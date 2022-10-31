@@ -14,12 +14,13 @@ int main()
 
     while (true)
     {
-        cout << "Type wanted command: ";
+        cout << "Available commands: \ngenUsers\nprintUsers\nprintUser (number)\ngenTransaction\nprintTransactions\nprintTransaction (number)\nstartMining\nprintBlock (number)\nprintAllBlocks\nquit\n\nType wanted command: ";
         cin >> command;
 
         if (command == "genUsers")
         {
             generateUsers(users);
+            cout << "Users generated!" << endl;
         }
 
         else if (command == "printUsers")
@@ -48,6 +49,7 @@ int main()
         else if (command == "genTransactions")
         {
             generateTransactions(users, transactions);
+            cout << "Transactions generated!" << endl;
         }
 
         else if (command == "printTransactions")
@@ -90,7 +92,7 @@ int main()
             cout << "Previous block hash: " << blockchain.at(i).prevHash << endl;
             cout << "Timestamp: " << blockchain.at(i).timestamp << endl;
             cout << "Version: " << blockchain.at(i).version << endl;
-            cout << "Merkle Root hash: " << blockchain.at(i).merkelRoot.substr(0, 64) << endl;
+            cout << "Merkle Root hash: " << blockchain.at(i).merkelRoot << endl;
             cout << "Nonce: " << blockchain.at(i).nonce << endl;
             cout << "Difficulty: " << blockchain.at(i).diff << endl;
         }

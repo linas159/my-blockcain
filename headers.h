@@ -73,5 +73,6 @@ struct blockChain
 
 void generateUsers(vector<user> &users);
 void generateTransactions(vector<user> users, vector <transaction> &transactions);
+void generateMerkelRoot(blockChain& bc);
 string mineBlock(blockChain &bc, string prevHash, int k);
 void mineBlocks(vector<user>& users, vector<transaction>& transactions, vector<blockChain>& blockchain);
