@@ -58,7 +58,7 @@ void generateMerkelRoot(blockChain &bc)
 	bc.merkelRoot = sha256(bc.merkelRoot);
 }
 
-string mineBlock(blockChain& bc, string prevHash, int k)
+string mineBlock(blockChain& bc, string prevHash, int k, long long limit)
 {
 	if (k == 1)
 		bc.prevHash = sha256("1");
@@ -67,14 +67,14 @@ string mineBlock(blockChain& bc, string prevHash, int k)
 
 	bc.timestamp = time(nullptr);
 	bc.version = "v" + to_string(k) + ".0";
-	bc.diff = "0";
+	bc.diff = "0000";
 
 	generateMerkelRoot(bc);
 		
 	int x = bc.diff.size();
 	string newhash;
 	int nonce = 0;
-	while (true)
+	while (nonce < limit)
 	{
 		newhash = sha256(bc.diff + bc.merkelRoot + bc.prevHash + to_string(bc.timestamp) + bc.version + to_string(nonce));
 		if (newhash.substr(0, x) == bc.diff) {
@@ -92,50 +92,79 @@ void mineBlocks(vector<user>& users, vector<transaction>& transactions, vector<b
 	int k = 0;
 	while (transactions.size() != 0)
 	{
-		blockChain tempbc;
-		while (tempbc.blocks.transactions.size() != 100 && transactions.size() != 0) // block'ą sudaro 100 transakcijų
+		blockChain tempbc[5];
+		for (int j = 0; j < 5; j++) // 5 At the same time
 		{
-
-			uniform_int_distribution<> distr(0, transactions.size() - 1);
-			int random = rand() % transactions.size(), i;
-
-			for (i = 0; i < 1000; i++)
+			while (tempbc[j].blocks.transactions.size() != 100 && transactions.size() != 0) // block'ą sudaro 100 transakcijų
 			{
-				if (transactions.at(random).getSender() == users.at(i).getPublicKey())
+
+				uniform_int_distribution<> distr(0, transactions.size() - 1);
+				int random = rand() % transactions.size(), i;
+
+				for (i = 0; i < 1000; i++)
 				{
+					if (transactions.at(random).getSender() == users.at(i).getPublicKey())
+					{
+						break;
+					}
+				}
+
+				if (users.at(i).getBalance() >= transactions.at(random).getSum()) // TRANSACTION VERIFICATION
+				{
+					tempbc[j].blocks.transactions.push_back(transactions.at(random));
+					if (tempbc[j].blocks.transactions.back().getTransactionID() != transactions.at(random).getTransactionID())
+					{
+						tempbc[j].blocks.transactions.pop_back();
+					}
+					//transactions.erase(transactions.begin() + random);
+				}
+				else {
+					transactions.erase(transactions.begin() + random);
+				}
+			}
+		}
+		
+		long long limit = 10000;
+		bool ar = 0;
+		k++;
+		while (true)
+		{
+			for (int i = 0; i < 5; i++)// 5 At the same time
+			{
+				if (k == 1)
+				{
+					tempbc[i].blocks.hash = mineBlock(tempbc[i], "", k, limit);
+				}
+				else
+				{
+					tempbc[i].blocks.hash = mineBlock(tempbc[i], blockchain.at(k - 2).blocks.hash, k, limit);
+				}
+				if (tempbc[i].blocks.hash != "0")
+				{
+					blockchain.push_back(tempbc[i]);
+					cout << "Block mined! hash: " << blockchain.at(k - 1).blocks.hash << endl;
+					ar = 1;
+					for (int j = 0; j < blockchain.back().blocks.transactions.size(); j++)
+					{
+						for (int l = 0; l < transactions.size(); l++)
+						{
+							if (blockchain.back().blocks.transactions.at(j).getTransactionID() == transactions.at(l).getTransactionID())
+							{
+								transactions.erase(transactions.begin() + l);
+							}
+						}
+					}
 					break;
 				}
 			}
-
-			if (users.at(i).getBalance() >= transactions.at(random).getSum()) // TRANSACTION VERIFICATION
+			if (ar)
 			{
-				tempbc.blocks.transactions.push_back(transactions.at(random));
-				if (tempbc.blocks.transactions.back().getTransactionID() != transactions.at(random).getTransactionID())
-				{
-					tempbc.blocks.transactions.pop_back();
-				}
-				transactions.erase(transactions.begin() + random);
+				break;
 			}
-			else {
-				transactions.erase(transactions.begin() + random);
-			}
+			limit *= 2;
 		}
 
-		k++;
-		if (k == 1)
-		{
-			tempbc.blocks.hash = mineBlock(tempbc, "", k);
-		}
-		else
-		{
-
-			tempbc.blocks.hash = mineBlock(tempbc, blockchain.at(k - 2).blocks.hash, k);
-		}
-
-		blockchain.push_back(tempbc);
-		cout << "Block mined! hash: " << blockchain.at(k - 1).blocks.hash << endl;
-
-		for (auto tran : blockchain.at(k - 1).blocks.transactions) {
+		for (auto tran : blockchain.at(k - 1).blocks.transactions) { //Balance update
 			int send = 0, get = 0;
 			for (int i = 0; i < 1000; i++) {
 				if (users.at(i).getPublicKey() == tran.getSender())
